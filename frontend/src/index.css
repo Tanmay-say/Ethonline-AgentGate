@@ -1,0 +1,240 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --color-bg-base: #F5F0EB;
+  --color-bg-lavender: #ECECF7;
+  --color-bg-ice: #EEF3F7;
+  --color-orange: #F15A24;
+  --color-orange-light: #FFCD9F;
+  --color-violet: #DEC8F8;
+  --color-blue-light: #BCE3FB;
+  --color-peach: #FBD7B6;
+  --color-dark: #1E1E1E;
+  --color-banner-blue: #C7E5F9;
+}
+
+body {
+  background-color: var(--color-bg-base);
+  color: #1E1E1E;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: #FFCD9F;
+  color: #1E1E1E;
+}
+
+/* RPC Fast style — large stat numbers */
+.stat-number {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: #F15A24;
+  line-height: 1;
+}
+
+/* Comparison cards — exact RPC Fast look */
+.rf-card {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 24px;
+  padding: 40px;
+  border: 2px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+.rf-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px -8px rgba(0,0,0,0.06);
+}
+.rf-card.is-violet {
+  border-color: #DEC8F8;
+  background: rgba(222, 200, 248, 0.12);
+}
+.rf-card.is-orange {
+  border-color: #FBD7B6;
+  background: rgba(251, 215, 182, 0.12);
+}
+.rf-card.is-blue {
+  border-color: #BCE3FB;
+  background: rgba(188, 227, 251, 0.12);
+}
+.rf-card.is-black {
+  border-color: #1E1E1E;
+  background: rgba(30, 30, 30, 0.03);
+}
+
+/* Card label pills */
+.rf-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 28px;
+  border-radius: 16px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1.3;
+  text-align: center;
+  color: #1E1E1E;
+  min-width: 160px;
+  flex-shrink: 0;
+}
+.rf-pill.violet { background: #DEC8F8; }
+.rf-pill.orange { background: #FBD7B6; }
+.rf-pill.blue { background: #BCE3FB; }
+.rf-pill.black { background: #1E1E1E; color: #fff; }
+
+/* Colored text spans */
+.text-rf-orange { color: #F15A24; }
+.text-rf-violet { color: #7C3AED; }
+.text-rf-blue { color: #2563EB; }
+
+/* Colored span pills inline in text */
+.span-pill {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.span-pill.orange { background: #FBD7B6; color: #1E1E1E; }
+.span-pill.violet { background: #DEC8F8; color: #1E1E1E; }
+.span-pill.blue   { background: #BCE3FB; color: #1E1E1E; }
+
+/* Layer cards — exact RPC Fast stacking with colored bg & border */
+.layer-card {
+  border-radius: 24px;
+  padding: 48px;
+  border: 2px solid transparent;
+}
+.layer-card.blue-layer {
+  background: #E8F2FA;
+  border-color: #BCE3FB;
+}
+.layer-card.orange-layer {
+  background: #FDF0E3;
+  border-color: #FBD7B6;
+}
+.layer-card.violet-layer {
+  background: #F0E8FA;
+  border-color: #DEC8F8;
+}
+
+/* Feature badges inside layers */
+.feature-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1E1E1E;
+}
+.feature-badge.orange { background: #FBD7B6; }
+.feature-badge.blue   { background: #BCE3FB; }
+.feature-badge.violet { background: #DEC8F8; }
+
+/* Pricing cards — RPC Fast exact look */
+.pricing-card {
+  border: 2.5px solid #1E1E1E;
+  border-radius: 24px;
+  padding: 40px;
+  background: #F5F0EB;
+  display: flex;
+  flex-direction: column;
+}
+.pricing-card.popular {
+  background: #F0E8FA;
+}
+
+/* Pricing dotted lines */
+.pricing-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px dotted rgba(0,0,0,0.15);
+  font-size: 15px;
+}
+.pricing-row:last-child {
+  border-bottom: none;
+}
+
+/* Announcement banner */
+.top-banner {
+  background: var(--color-banner-blue);
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 14px;
+  color: #1E1E1E;
+}
+
+/* Orange CTA button */
+.btn-orange {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 32px;
+  border-radius: 12px;
+  background: #F15A24;
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  text-decoration: none;
+}
+.btn-orange:hover {
+  background: #d94d1a;
+  transform: translateY(-1px);
+}
+
+/* Outline button */
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 28px;
+  border-radius: 12px;
+  background: transparent;
+  color: #1E1E1E;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  border: 2px solid #1E1E1E;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-decoration: none;
+}
+.btn-outline:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+/* Trust logo carousel */
+.logo-track {
+  display: flex;
+  gap: 48px;
+  animation: marquee 25s linear infinite;
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #F5F0EB; }
+::-webkit-scrollbar-thumb { background: #d4cec6; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #bab4ac; }

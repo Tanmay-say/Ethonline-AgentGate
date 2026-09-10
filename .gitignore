@@ -20,6 +20,8 @@ Task.md
 backend/.env
 *.env
 */.env
+frontend/.env
+contracts/.env
 
 ###############################################
 *.env.local
@@ -37,6 +39,10 @@ backend/.env
 */planning
 backend/node_modules/
 backend/dist/
+contracts/lib/
+contracts/out/
+contracts/cache/
+contracts/broadcast/
 
 ###########################################################
 # Generated / local folders — do not push
@@ -54,6 +60,7 @@ frontend/.vite/
 frontend/coverage/
 frontend/.turbo/
 frontend/.cache/
+frontend/package-lock.json
 
 # Smart contracts (Foundry / Hardhat artifacts)
 smart_contracts/node_modules/

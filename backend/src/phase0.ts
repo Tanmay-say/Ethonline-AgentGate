@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { createPublicClient, getAddress, http } from "viem";
 import { baseSepolia } from "viem/chains";
 import { ERC5564_CONTRACT_ADDRESS, ERC6538_CONTRACT_ADDRESS } from "@scopelift/stealth-address-sdk/dist/config/index.js";
