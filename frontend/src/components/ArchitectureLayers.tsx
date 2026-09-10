@@ -13,20 +13,16 @@ export const ArchitectureLayers: React.FC = () => {
 
         <div className="flex flex-col gap-8">
 
-          {/* Layer 1: Blue */}
+          {/* Layer 1: Blue — Own the Privacy */}
           <div className="layer-card blue-layer">
             <div className="flex flex-col lg:flex-row gap-8 items-start">
-              {/* Icon Placeholder */}
-              <div className="w-[200px] h-[160px] rounded-2xl bg-white/60 border border-rf-blue flex items-center justify-center shrink-0">
-                <svg width="80" height="80" viewBox="0 0 80 80" fill="none" className="text-rf-dark opacity-60">
-                  <circle cx="40" cy="40" r="36" stroke="currentColor" strokeWidth="2" fill="none" />
-                  <circle cx="40" cy="40" r="18" stroke="currentColor" strokeWidth="2" fill="none" />
-                  <line x1="4" y1="40" x2="76" y2="40" stroke="currentColor" strokeWidth="1.5" />
-                  <line x1="40" y1="4" x2="40" y2="76" stroke="currentColor" strokeWidth="1.5" />
-                  <circle cx="22" cy="24" r="4" fill="#F15A24" opacity="0.7" />
-                  <circle cx="58" cy="56" r="4" fill="#DEC8F8" opacity="0.7" />
-                  <circle cx="56" cy="28" r="3" fill="#BCE3FB" opacity="0.7" />
-                </svg>
+              {/* CDN Image a */}
+              <div className="w-[220px] h-[180px] rounded-2xl bg-white/60 border border-rf-blue flex items-center justify-center shrink-0 overflow-hidden p-4">
+                <img
+                  src="https://cdn.prod.website-files.com/62f387a85a056619ebadb8de/69a6adc5477d3b11cf1c53f9_Group%202087331407.svg"
+                  alt="Stealth address routing diagram"
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div>
                 <h3 className="font-display text-[28px] font-bold text-rf-dark mb-3">
@@ -54,17 +50,16 @@ export const ArchitectureLayers: React.FC = () => {
             </div>
           </div>
 
-          {/* Layer 2: Orange */}
+          {/* Layer 2: Orange — Own the Companion */}
           <div className="layer-card orange-layer">
             <div className="flex flex-col lg:flex-row-reverse gap-8 items-start">
-              <div className="w-[200px] h-[160px] rounded-2xl bg-white/60 border border-rf-peach flex items-center justify-center shrink-0">
-                <svg width="80" height="80" viewBox="0 0 80 80" fill="none" className="text-rf-dark opacity-60">
-                  <rect x="10" y="20" width="60" height="40" rx="8" stroke="currentColor" strokeWidth="2" fill="none" />
-                  <rect x="22" y="30" width="36" height="20" rx="4" stroke="currentColor" strokeWidth="1.5" fill="none" />
-                  <line x1="22" y1="40" x2="58" y2="40" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" />
-                  <circle cx="40" cy="12" r="6" fill="#FBD7B6" />
-                  <circle cx="40" cy="68" r="6" fill="#DEC8F8" />
-                </svg>
+              {/* CDN Image b */}
+              <div className="w-[220px] h-[180px] rounded-2xl bg-white/60 border border-rf-peach flex items-center justify-center shrink-0 overflow-hidden p-4">
+                <img
+                  src="https://cdn.prod.website-files.com/62f387a85a056619ebadb8de/69dfa11dac5b06d54a67fcc6_e5ea8999e441fa27b9a4eee065aa7acb_Group%202087331528.svg"
+                  alt="Companion signing architecture"
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div>
                 <h3 className="font-display text-[28px] font-bold text-rf-dark mb-3">
@@ -91,18 +86,16 @@ export const ArchitectureLayers: React.FC = () => {
             </div>
           </div>
 
-          {/* Layer 3: Violet */}
+          {/* Layer 3: Violet — Own the Agent */}
           <div className="layer-card violet-layer">
             <div className="flex flex-col lg:flex-row gap-8 items-start">
-              <div className="w-[200px] h-[160px] rounded-2xl bg-white/60 border border-rf-violet flex items-center justify-center shrink-0">
-                <svg width="80" height="80" viewBox="0 0 80 80" fill="none" className="text-rf-dark opacity-60">
-                  <path d="M20 60 L40 20 L60 60 Z" stroke="currentColor" strokeWidth="2" fill="none" />
-                  <circle cx="40" cy="20" r="5" fill="#DEC8F8" />
-                  <circle cx="20" cy="60" r="5" fill="#BCE3FB" />
-                  <circle cx="60" cy="60" r="5" fill="#FBD7B6" />
-                  <circle cx="40" cy="46" r="8" stroke="currentColor" strokeWidth="1.5" fill="none" />
-                  <circle cx="40" cy="46" r="3" fill="#F15A24" opacity="0.5" />
-                </svg>
+              {/* CDN Image c */}
+              <div className="w-[220px] h-[180px] rounded-2xl bg-white/60 border border-rf-violet flex items-center justify-center shrink-0 overflow-hidden p-4">
+                <img
+                  src="https://cdn.prod.website-files.com/62f387a85a056619ebadb8de/699497d6e1a720adf1b8d9de_d39d5555fa8f600b54b6b9d9e0073f58_Group%20470231.avif"
+                  alt="Agent stack diagram"
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div>
                 <h3 className="font-display text-[28px] font-bold text-rf-dark mb-3">

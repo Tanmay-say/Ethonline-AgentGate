@@ -4,7 +4,7 @@ export const ComparisonGrid: React.FC = () => {
   return (
     <section id="how-it-works" className="py-20 md:py-28" style={{ background: 'linear-gradient(180deg, #ECECF7 0%, #EEF3F7 100%)' }}>
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10">
-        <h2 className="font-display text-[30px] sm:text-[38px] md:text-[46px] font-bold text-rf-dark text-center leading-tight mb-14 max-w-3xl mx-auto">
+        <h2 className="font-display text-[30px] sm:text-[38px] md:text-[46px] lg:text-[52px] font-bold text-rf-dark text-center leading-tight mb-14 whitespace-nowrap">
           AgentGate vs Exposed Agent Wallets
         </h2>
 

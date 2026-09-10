@@ -30,9 +30,9 @@ export const Hero: React.FC = () => {
             </div>
           </div>
 
-          {/* Right: Video — small and properly adjusted to the right side */}
+          {/* Right: Video — bigger circle, no logo overlay */}
           <div className="relative flex items-center justify-center lg:justify-end">
-            <div className="relative w-[340px] h-[340px] sm:w-[420px] sm:h-[420px] lg:w-[480px] lg:h-[480px]">
+            <div className="relative w-[360px] h-[360px] sm:w-[440px] sm:h-[440px] lg:w-[540px] lg:h-[540px]">
               {/* Outer ring — exact RPC Fast style with the circle illustration */}
               <div className="absolute inset-0 rounded-full border-[6px] border-white shadow-lg">
                 <div className="absolute inset-[12px] rounded-full overflow-hidden bg-rf-dark">
@@ -41,17 +41,9 @@ export const Hero: React.FC = () => {
                     loop
                     muted
                     playsInline
-                    className="w-full h-full object-cover opacity-90"
+                    className="w-full h-full object-cover"
                     src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260603_132049_036591b8-6e92-4760-b94c-a7ea6eef315c.mp4"
                   />
-                  {/* Center logo overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <img
-                      src="/images/Agentgate_logo_png.png"
-                      alt="AgentGate"
-                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg shadow-2xl opacity-80"
-                    />
-                  </div>
                 </div>
               </div>
 
