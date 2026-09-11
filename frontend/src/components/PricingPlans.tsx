@@ -62,17 +62,17 @@ export const PricingPlans: React.FC = () => {
   ];
 
   return (
-    <section id="pricing" className="py-20 md:py-28" style={{ background: 'linear-gradient(180deg, #F5F0EB 0%, #EEF3F7 100%)' }}>
+    <section id="pricing" className="py-14 md:py-20" style={{ background: 'linear-gradient(180deg, #F5F0EB 0%, #EEF3F7 100%)' }}>
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10">
-        <h2 className="font-display text-[30px] sm:text-[38px] md:text-[46px] font-bold text-rf-dark text-center leading-tight mb-2">
+        <h2 className="font-display text-[28px] sm:text-[34px] md:text-[42px] font-bold text-rf-dark text-center leading-tight mb-1">
           AgentGate Pricing
         </h2>
-        <h3 className="font-display text-[26px] sm:text-[32px] md:text-[38px] font-bold text-rf-dark text-center leading-tight mb-14">
+        <h3 className="font-display text-[24px] sm:text-[28px] md:text-[34px] font-bold text-rf-dark text-center leading-tight mb-10">
           Start now — Pay as you like it
         </h3>
 
         {/* 3-Column Pricing Grid — exact RPC Fast look */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
           {plans.map((plan) => (
             <div
               key={plan.name}
@@ -84,9 +84,9 @@ export const PricingPlans: React.FC = () => {
                 </div>
               )}
 
-              <div className="text-center mb-6">
-                <h4 className="font-display text-xl font-bold text-rf-dark">{plan.name}</h4>
-                <div className="mt-3">
+              <div className="text-center mb-5">
+                <h4 className="font-display text-lg font-bold text-rf-dark">{plan.name}</h4>
+                <div className="mt-2">
                   <span className="font-display text-[48px] font-bold text-rf-dark tracking-tight leading-none">
                     {plan.price}
                   </span>
@@ -115,7 +115,7 @@ export const PricingPlans: React.FC = () => {
                 ))}
               </div>
 
-              <div className="mt-8">
+              <div className="mt-6">
                 <a
                   href="#developer-api"
                   className={`${plan.btnClass} w-full text-center`}

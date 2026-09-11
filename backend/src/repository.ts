@@ -62,7 +62,7 @@ export class PostgresPaymentRepository implements PaymentRepository {
     if (!current) throw new Error("NOT_FOUND");
     const updated = { ...current, ...patch, updatedAt: new Date().toISOString() };
     await this.pool.query(
-      `update payment_jobs set state=$2, transfer_tx_hash=$3, announce_tx_hash=$4,
+       `update payment_jobs set state=$2, transfer_tx_hash=$3, announce_tx_hash=$4,
        stealth_address=$5, ephemeral_public_key=$6, view_tag=$7, updated_at=$8 where id=$1`,
       [id, updated.state, updated.transferTxHash ?? null, updated.announceTxHash ?? null,
         updated.stealthAddress ?? null, updated.ephemeralPublicKey ?? null, updated.viewTag ?? null, updated.updatedAt]

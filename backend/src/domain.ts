@@ -34,6 +34,7 @@ export type PaymentJob = {
   state: PaymentState;
   transferTxHash?: `0x${string}`;
   announceTxHash?: `0x${string}`;
+  transactionHash?: `0x${string}`;
   createdAt: string;
   updatedAt: string;
 };

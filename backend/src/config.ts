@@ -7,6 +7,7 @@ const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(8000),
   DATABASE_URL: z.string().url().optional(),
+  SUPABASE_POOLER: z.string().url().optional(),
   BASE_SEPOLIA_RPC_URL: z.string().url().default("https://sepolia.base.org"),
   BASE_SEPOLIA_CHAIN_ID: z.coerce.number().int().default(84532),
   USDC_ADDRESS: optionalAddress,
@@ -28,7 +29,8 @@ export type Config = z.infer<typeof envSchema>;
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const parsed = envSchema.parse(env);
-  if (parsed.NODE_ENV === "production" && !parsed.DATABASE_URL) {
+  const databaseUrl = parsed.SUPABASE_POOLER ?? parsed.DATABASE_URL;
+  if (parsed.NODE_ENV === "production" && !databaseUrl) {
     throw new Error("DATABASE_URL is required in production");
   }
   if (parsed.NODE_ENV === "production" && !parsed.USDC_ADDRESS) {
@@ -37,5 +39,5 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   if (parsed.NODE_ENV === "production" && (parsed.API_BEARER_TOKEN.startsWith("development-") || parsed.SIGNER_BEARER_TOKEN.startsWith("development-"))) {
     throw new Error("API_BEARER_TOKEN and SIGNER_BEARER_TOKEN must be configured in production");
   }
-  return parsed;
+  return { ...parsed, DATABASE_URL: databaseUrl };
 }

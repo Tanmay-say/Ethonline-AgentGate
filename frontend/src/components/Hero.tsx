@@ -1,41 +1,74 @@
 import React from 'react';
+import { motion } from 'motion/react';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.1, duration: 0.5, ease: 'easeOut' as const },
+  }),
+};
 
 export const Hero: React.FC = () => {
   return (
     <section className="relative overflow-hidden" style={{ background: 'linear-gradient(180deg, #F5F0EB 0%, #FDF0E3 40%, #F5F0EB 100%)' }}>
-      <div className="max-w-[1280px] mx-auto px-6 lg:px-10 pt-16 pb-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[70vh]">
+      <div className="max-w-[1280px] mx-auto px-6 lg:px-10 pt-10 pb-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center min-h-[65vh]">
           
           {/* Left: Text Content */}
           <div className="flex flex-col justify-center">
-            <h1 className="font-display text-[40px] sm:text-[48px] md:text-[56px] lg:text-[60px] font-bold text-rf-dark leading-[1.1] tracking-tight">
+            <motion.h1
+              initial="hidden"
+              animate="visible"
+              custom={0}
+              variants={fadeUp}
+              className="font-display text-[38px] sm:text-[46px] md:text-[52px] lg:text-[56px] font-bold text-rf-dark leading-[1.08] tracking-tight"
+            >
               The fastest stealth payment API for agents that can't tolerate exposure
-            </h1>
+            </motion.h1>
 
-            <p className="mt-7 text-[22px] sm:text-[26px] font-display text-rf-dark leading-snug">
+            <motion.p
+              initial="hidden"
+              animate="visible"
+              custom={1}
+              variants={fadeUp}
+              className="mt-5 text-[20px] sm:text-[24px] font-display text-rf-dark leading-snug"
+            >
               <span className="span-pill orange">Non-custodial</span> ,{' '}
               <span className="span-pill violet">ERC-5564 stealth</span>{' '}
               agent payments with{' '}
               <span className="span-pill blue">99.99% delivery</span> .
-            </p>
+            </motion.p>
 
             {/* CTA Row */}
-            <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-5 p-5 rounded-2xl border-2 border-rf-orange-light bg-white/40">
-              <a href="#developer-api" className="btn-orange whitespace-nowrap">
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              custom={2}
+              variants={fadeUp}
+              className="mt-7 flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl border-2 border-rf-orange-light bg-white/40"
+            >
+              <a href="#developer-api" className="btn-orange whitespace-nowrap text-sm">
                 Start for Free
               </a>
-              <p className="text-[15px] text-rf-dark/80 leading-relaxed">
+              <p className="text-[13px] text-rf-dark/70 leading-relaxed">
                 Built by infrastructure engineers running nodes for leading ERC-5564 stealth protocols, AI agent frameworks, and DeFi privacy tools.
               </p>
-            </div>
+            </motion.div>
           </div>
 
           {/* Right: Video — bigger circle, no logo overlay */}
-          <div className="relative flex items-center justify-center lg:justify-end">
-            <div className="relative w-[360px] h-[360px] sm:w-[440px] sm:h-[440px] lg:w-[540px] lg:h-[540px]">
-              {/* Outer ring — exact RPC Fast style with the circle illustration */}
-              <div className="absolute inset-0 rounded-full border-[6px] border-white shadow-lg">
-                <div className="absolute inset-[12px] rounded-full overflow-hidden bg-rf-dark">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, delay: 0.2, ease: 'easeOut' }}
+            className="relative flex items-center justify-center lg:justify-end"
+          >
+            <div className="relative w-[320px] h-[320px] sm:w-[400px] sm:h-[400px] lg:w-[480px] lg:h-[480px]">
+              {/* Outer ring */}
+              <div className="absolute inset-0 rounded-full border-[5px] border-white shadow-lg">
+                <div className="absolute inset-[10px] rounded-full overflow-hidden bg-rf-dark">
                   <video
                     autoPlay
                     loop
@@ -47,15 +80,29 @@ export const Hero: React.FC = () => {
                 </div>
               </div>
 
-              {/* Decorative dots/lines orbiting — styled like RPC Fast Ethereum illustration */}
-              <div className="absolute -top-2 left-1/3 w-3 h-3 rounded-full bg-rf-violet" />
-              <div className="absolute top-1/4 -right-3 w-3 h-3 rounded-full bg-rf-orange" />
-              <div className="absolute bottom-1/4 -left-3 w-2.5 h-2.5 rounded-full bg-rf-blue" />
-              <div className="absolute -bottom-2 right-1/3 w-3 h-3 rounded-full bg-rf-peach" />
-              <div className="absolute top-1/2 -right-6 w-[60px] h-[2px] bg-rf-orange-light" />
-              <div className="absolute bottom-8 -left-8 w-[50px] h-[2px] bg-rf-violet" />
+              {/* Decorative dots */}
+              <motion.div
+                animate={{ y: [0, -6, 0] }}
+                transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
+                className="absolute -top-1 left-1/3 w-2.5 h-2.5 rounded-full bg-rf-violet"
+              />
+              <motion.div
+                animate={{ x: [0, 5, 0] }}
+                transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut', delay: 0.5 }}
+                className="absolute top-1/4 -right-2 w-2.5 h-2.5 rounded-full bg-rf-orange"
+              />
+              <motion.div
+                animate={{ y: [0, 5, 0] }}
+                transition={{ repeat: Infinity, duration: 3.5, ease: 'easeInOut', delay: 1 }}
+                className="absolute bottom-1/4 -left-2 w-2 h-2 rounded-full bg-rf-blue"
+              />
+              <motion.div
+                animate={{ x: [0, -4, 0] }}
+                transition={{ repeat: Infinity, duration: 2.8, ease: 'easeInOut', delay: 0.3 }}
+                className="absolute -bottom-1 right-1/3 w-2.5 h-2.5 rounded-full bg-rf-peach"
+              />
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

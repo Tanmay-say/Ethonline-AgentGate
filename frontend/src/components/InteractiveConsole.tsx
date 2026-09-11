@@ -92,14 +92,14 @@ agentgate-cli scan \\
   ] as const;
 
   return (
-    <section id="developer-api" className="py-20 md:py-28" style={{ background: '#F5F0EB' }}>
+    <section id="developer-api" className="py-14 md:py-20" style={{ background: '#F5F0EB' }}>
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-12 gap-6">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-8 gap-5">
           <div>
-            <h2 className="font-display text-[30px] sm:text-[38px] md:text-[46px] font-bold text-rf-dark leading-tight max-w-2xl">
+            <h2 className="font-display text-[28px] sm:text-[34px] md:text-[42px] font-bold text-rf-dark leading-tight max-w-2xl">
               Test the Stealth Payment Flow
             </h2>
-            <p className="mt-3 text-[17px] text-rf-dark/70 max-w-xl">
+            <p className="mt-2 text-[15px] text-rf-dark/65 max-w-xl">
               Inspect the Bazantic recipe, FastAPI endpoints, and scheme-1 stealth derivation used by Claude Code.
             </p>
           </div>
@@ -114,7 +114,7 @@ agentgate-cli scan \\
         </div>
 
         {/* Dark Code Box */}
-        <div className="rounded-rf border-2 border-black/10 bg-[#1E1E1E] text-white shadow-xl overflow-hidden">
+        <div className="rounded-2xl border-2 border-black/10 bg-[#1E1E1E] text-white shadow-xl overflow-hidden">
           {/* Tabs */}
           <div className="px-5 py-3 bg-black/30 border-b border-white/10 flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-1.5">
@@ -167,7 +167,7 @@ agentgate-cli scan \\
         </div>
 
         {/* Privacy warning */}
-        <div className="mt-6 p-5 rounded-rf bg-amber-100/50 border border-amber-300/50 flex items-start gap-3">
+        <div className="mt-5 p-4 rounded-xl bg-amber-100/50 border border-amber-300/50 flex items-start gap-3">
           <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <p className="text-sm text-amber-900 leading-relaxed">
             <strong>Privacy Boundary:</strong> AgentGate guarantees ERC-5564 <em>recipient-address privacy</em>. Sender anonymity and hidden amounts are not provided. The sender's wallet address remains publicly visible.

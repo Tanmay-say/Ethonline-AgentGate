@@ -7,6 +7,7 @@ import { loadConfig, type Config } from "./config.js";
 import { PRIVACY_NOTICE } from "./domain.js";
 import { MemoryPaymentRepository, PostgresPaymentRepository } from "./repository.js";
 import { PaymentService } from "./service.js";
+import { BaseSepoliaVerifier } from "./chain.js";
 import { openApiDocument } from "./openapi.js";
 import { z } from "zod";
 
@@ -23,6 +24,7 @@ export function createApp(config: Config = loadConfig()) {
   const pool = config.DATABASE_URL ? new Pool({ connectionString: config.DATABASE_URL, ssl: { rejectUnauthorized: false } }) : undefined;
   const repository = pool ? new PostgresPaymentRepository(pool) : new MemoryPaymentRepository();
   const service = new PaymentService(repository, config);
+  const verifier = new BaseSepoliaVerifier(config);
   const app = express();
   app.use(helmet());
   app.use(cors({ origin: config.FRONTEND_ORIGIN }));
@@ -49,16 +51,16 @@ export function createApp(config: Config = loadConfig()) {
 
   app.get("/v1/payments/:id", requireBearer(config.API_BEARER_TOKEN), asyncHandler(async (req, res) => {
     const job = await service.get(String(req.params.id));
-    res.json({ ...service.response(job), payer: job.payer, recipient_fingerprint: job.recipientFingerprint });
+    res.json({ ...service.response(job), payer: job.payer, recipient_meta_address: job.recipientMetaAddress, recipient_fingerprint: job.recipientFingerprint });
   }));
   app.get("/v1/payments/:id/announce-tx", requireBearer(config.API_BEARER_TOKEN), (_req, res) => {
     res.status(503).json({ error: "ANNOUNCEMENT_CONTRACT_NOT_CONFIGURED", privacy_notice: PRIVACY_NOTICE });
   });
 
   app.post("/v1/payments/:id/transactions", requireBearer(config.SIGNER_BEARER_TOKEN), asyncHandler(async (req, res) => {
-    const body = z.object({ transfer_tx_hash: z.string().regex(/^0x[a-fA-F0-9]{64}$/).optional(), announce_tx_hash: z.string().regex(/^0x[a-fA-F0-9]{64}$/).optional(), state: z.enum(["SUBMITTED", "CONFIRMING", "CONFIRMED", "RECONCILING", "REVERTED", "REJECTED", "EXPIRED"]) }).parse(req.body);
-    const updated = await service.updateState(String(req.params.id), body.state, body.transfer_tx_hash as `0x${string}` | undefined, body.announce_tx_hash as `0x${string}` | undefined);
-    res.json({ ...service.response(updated), verification: "pending-chain-receipt-verification" });
+    const body = z.object({ transaction_hash: z.string().regex(/^0x[a-fA-F0-9]{64}$/), stealth_address: z.string().regex(/^0x[a-fA-F0-9]{40}$/), ephemeral_public_key: z.string().min(4), view_tag: z.string().min(2) }).parse(req.body);
+    const result = await service.submitTransaction(String(req.params.id), body.transaction_hash as `0x${string}`, body.stealth_address as `0x${string}`, body.ephemeral_public_key, body.view_tag, verifier);
+    res.json({ ...service.response(result.job), verification: result.reason ?? "verified" });
   }));
 
   app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {

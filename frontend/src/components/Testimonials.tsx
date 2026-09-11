@@ -69,11 +69,11 @@ export const Testimonials: React.FC = () => {
   };
 
   return (
-    <section className="py-20 md:py-28" style={{ background: '#F5F0EB' }}>
+    <section className="py-14 md:py-20" style={{ background: '#F5F0EB' }}>
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10">
-        {/* Header with arrows — exact RPC Fast layout */}
-        <div className="flex items-center justify-between mb-12">
-          <h2 className="font-display text-[28px] sm:text-[34px] md:text-[42px] font-bold text-rf-dark leading-tight">
+        {/* Header with arrows */}
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="font-display text-[26px] sm:text-[32px] md:text-[38px] font-bold text-rf-dark leading-tight">
             What Web3 leaders say about AgentGate
           </h2>
           <div className="flex items-center gap-3">

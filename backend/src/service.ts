@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { parseUnits } from "viem";
 import type { Config } from "./config.js";
 import { PAYMENT_TRANSITIONS, PRIVACY_NOTICE, type PaymentJob, type PaymentRepository, type PaymentState, type PrepareInput } from "./domain.js";
+import type { BaseSepoliaVerifier } from "./chain.js";
 
 export class PaymentService {
   constructor(private readonly repository: PaymentRepository, private readonly config: Config) {}
@@ -45,6 +46,20 @@ export class PaymentService {
     if (!PAYMENT_TRANSITIONS[job.state].includes(state)) throw new Error("INVALID_STATE_TRANSITION");
     if (state === "EXPIRED" && new Date(job.expiresAt).getTime() > Date.now()) throw new Error("PLAN_NOT_EXPIRED");
     return this.repository.update(id, { state, transferTxHash, announceTxHash });
+  }
+
+  async submitTransaction(id: string, transactionHash: `0x${string}`, stealthAddress: `0x${string}`, ephemeralPublicKey: string, viewTag: string, verifier?: BaseSepoliaVerifier): Promise<{ job: PaymentJob; reason?: string }> {
+    const job = await this.get(id);
+    if (job.state !== "PREPARED" && job.state !== "SUBMITTED" && job.state !== "CONFIRMING" && job.state !== "RECONCILING") throw new Error("INVALID_SUBMISSION_STATE");
+    if (new Date(job.expiresAt).getTime() < Date.now()) {
+      const expired = await this.repository.update(id, { state: "EXPIRED" });
+      return { job: expired };
+    }
+    const submitted = await this.repository.update(id, { state: "SUBMITTED", transferTxHash: transactionHash, stealthAddress, ephemeralPublicKey, viewTag });
+    if (!verifier) return { job: submitted, reason: "chain verifier unavailable" };
+    const result = await verifier.verifyPayment(submitted, transactionHash);
+    const verified = await this.repository.update(id, { state: result.status });
+    return { job: verified, reason: result.reason };
   }
 
   response(job: PaymentJob) {
