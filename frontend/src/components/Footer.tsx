@@ -5,14 +5,14 @@ export const Footer: React.FC = () => {
     <footer className="relative overflow-hidden bg-rf-dark text-white">
       {/* Superfluid-style giant letter background */}
       <div
-        className="absolute inset-0 pointer-events-none select-none flex items-center justify-center opacity-[0.035]"
+        className="absolute inset-0 pointer-events-none select-none flex items-center justify-center opacity-[0.050]"
         aria-hidden="true"
       >
         <span
           className="font-display font-bold text-white leading-none tracking-tighter"
-          style={{ fontSize: 'clamp(300px, 40vw, 700px)' }}
+          style={{ fontSize: 'clamp(200px, 40vw, 320px)' }}
         >
-          AG
+          AgentGate
         </span>
       </div>
 
@@ -21,7 +21,7 @@ export const Footer: React.FC = () => {
           {/* Brand */}
           <div className="md:col-span-4">
             <div className="flex items-center gap-2.5 mb-5">
-              <img src="/images/Agentgate_logo_png.png" alt="AgentGate" className="h-8 w-auto rounded brightness-200" />
+              <img src="/images/Agentgate_logo_png.png" alt="AgentGate" className="h-10 w-auto rounded brightness-200" />
               <span className="font-display font-bold text-xl text-white">AgentGate</span>
             </div>
             <p className="text-sm text-white/50 leading-relaxed max-w-sm">
