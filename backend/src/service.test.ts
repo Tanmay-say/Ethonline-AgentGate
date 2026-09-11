@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { loadConfig } from "./config.js";
 import { MemoryPaymentRepository } from "./repository.js";
 import { PaymentService } from "./service.js";
+import { createRecipientKeys, deriveStealthDestination } from "./stealth.js";
 
 function createService() {
   const config = loadConfig({ NODE_ENV: "test", API_BEARER_TOKEN: "test-api-token-123456", SIGNER_BEARER_TOKEN: "test-signer-token-123456" });
@@ -10,6 +11,7 @@ function createService() {
 
 const input = {
   payer: "0x1111111111111111111111111111111111111111" as `0x${string}`,
+  recipient: "agentB",
   recipientMetaAddress: "st:eth:0xrecipient-scheme-1",
   recipientFingerprint: "fp-test-123456",
   token: "0x2222222222222222222222222222222222222222" as `0x${string}`,
@@ -18,6 +20,31 @@ const input = {
 };
 
 describe("PaymentService", () => {
+  it("supports STANDARD without stealth metadata", async () => {
+    const service = createService();
+    const result = await service.prepare({ ...input, mode: "STANDARD", recipient: "0x3333333333333333333333333333333333333333", recipientMetaAddress: undefined, recipientFingerprint: undefined });
+    expect(result.job.mode).toBe("STANDARD");
+    expect(result.job.recipient).toBe("0x3333333333333333333333333333333333333333");
+    expect(result.job.recipientMetaAddress).toBeUndefined();
+  });
+
+  it("resolves STEALTH metadata from a registered Agent B without returning it in the public response", async () => {
+    const repository = new MemoryPaymentRepository();
+    const service = new PaymentService(repository, loadConfig({ NODE_ENV: "test", API_BEARER_TOKEN: "test-api-token-123456", SIGNER_BEARER_TOKEN: "test-signer-token-123456" }));
+    const keys = createRecipientKeys();
+    await service.registerRecipient("agentB", "0xA3b44f604589354cB65b6DAd431486aB7383D833", keys.stealthMetaAddressURI, "agent-b-fingerprint");
+    const result = await service.prepare({ ...input, mode: "STEALTH", recipient: "0xA3b44f604589354cB65b6DAd431486aB7383D833", recipientMetaAddress: undefined, recipientFingerprint: undefined });
+    expect(result.job.recipient).toBe("0xA3b44f604589354cB65b6DAd431486aB7383D833");
+    expect(result.job.recipientMetaAddress).toBe(keys.stealthMetaAddressURI);
+    expect(service.response(result.job)).not.toHaveProperty("recipientMetaAddress");
+    expect(deriveStealthDestination(result.job.recipientMetaAddress!).stealthAddress).toMatch(/^0x[0-9a-fA-F]{40}$/);
+  });
+
+  it("rejects an unregistered STEALTH recipient", async () => {
+    const service = createService();
+    await expect(service.prepare({ ...input, mode: "STEALTH", recipient: "0x4444444444444444444444444444444444444444", recipientMetaAddress: undefined, recipientFingerprint: undefined })).rejects.toThrow("STEALTH_RECIPIENT_NOT_REGISTERED");
+  });
+
   it("returns the same prepared plan for an identical idempotency request", async () => {
     const service = createService();
     const first = await service.prepare(input);

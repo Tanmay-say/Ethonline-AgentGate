@@ -42,14 +42,15 @@ export class BaseSepoliaVerifier {
   }
 
   async verifyPayment(job: PaymentJob, transactionHash: `0x${string}`): Promise<ChainPaymentResult> {
-    if (!this.config.HELPER_ADDRESS || !job.stealthAddress) return { status: "RECONCILING", reason: "payment plan lacks helper or stealth destination" };
+    if (job.mode === "STEALTH" && (!this.config.HELPER_ADDRESS || !job.stealthAddress)) return { status: "RECONCILING", reason: "payment plan lacks helper or stealth destination" };
     let transaction;
     try {
       transaction = await this.client.getTransaction({ hash: transactionHash });
     } catch {
       return { status: "SUBMITTED", reason: "transaction is not visible on the configured RPC yet" };
     }
-    if (transaction.from.toLowerCase() !== job.payer.toLowerCase() || transaction.to?.toLowerCase() !== this.config.HELPER_ADDRESS.toLowerCase()) {
+    const expectedTarget = job.mode === "STANDARD" ? job.tokenAddress : this.config.HELPER_ADDRESS;
+    if (!expectedTarget || transaction.from.toLowerCase() !== job.payer.toLowerCase() || transaction.to?.toLowerCase() !== expectedTarget.toLowerCase()) {
       return { status: "RECONCILING", reason: "transaction sender or helper mismatch" };
     }
     let receipt;
@@ -62,8 +63,13 @@ export class BaseSepoliaVerifier {
     const transferLogs = parseEventLogs({ abi: erc20TransferAbi, logs: receipt.logs, eventName: "Transfer", strict: false });
     const transfer = transferLogs.find((log) => log.address.toLowerCase() === job.tokenAddress.toLowerCase() &&
       log.args.from !== undefined && log.args.to !== undefined && log.args.from.toLowerCase() === job.payer.toLowerCase() &&
-      log.args.to.toLowerCase() === job.stealthAddress!.toLowerCase() && log.args.value === job.amountBaseUnits);
+      log.args.to.toLowerCase() === (job.mode === "STANDARD" ? job.recipient : job.stealthAddress)!.toLowerCase() && log.args.value === job.amountBaseUnits);
     if (!transfer) return { status: "RECONCILING", reason: "exact token transfer was not verified" };
+    if (job.mode === "STANDARD") {
+      const latest = await this.client.getBlockNumber();
+      const confirmations = latest - receipt.blockNumber + 1n;
+      return { status: confirmations >= BigInt(this.config.FINALITY_BLOCKS + 1) ? "CONFIRMED" : "CONFIRMING" };
+    }
     const announcements = parseEventLogs({ abi: erc5564AnnouncementAbi, logs: receipt.logs, eventName: "Announcement", strict: false });
     const announcement = announcements.find((log) => log.args.schemeId === 1n && log.args.stealthAddress !== undefined && log.args.stealthAddress.toLowerCase() === job.stealthAddress!.toLowerCase());
     if (!announcement) return { status: "RECONCILING", reason: "matching ERC-5564 Announcement was not verified" };

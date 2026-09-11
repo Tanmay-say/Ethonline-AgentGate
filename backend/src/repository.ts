@@ -1,9 +1,10 @@
 import { Pool } from "pg";
-import type { PaymentJob, PaymentRepository } from "./domain.js";
+import type { PaymentJob, PaymentRepository, RecipientRegistration } from "./domain.js";
 
 export class MemoryPaymentRepository implements PaymentRepository {
   private readonly jobs = new Map<string, PaymentJob>();
   private readonly keys = new Map<string, string>();
+  private readonly recipients = new Map<string, RecipientRegistration>();
 
   async findByIdempotencyKey(key: string): Promise<PaymentJob | undefined> {
     const id = this.keys.get(key);
@@ -27,6 +28,9 @@ export class MemoryPaymentRepository implements PaymentRepository {
     this.jobs.set(id, updated);
     return updated;
   }
+
+  async findRecipientRegistration(recipient: string): Promise<RecipientRegistration | undefined> { return this.recipients.get(recipient.toLowerCase()); }
+  async upsertRecipientRegistration(registration: RecipientRegistration): Promise<void> { this.recipients.set(registration.normalAddress.toLowerCase(), registration); }
 }
 
 export class PostgresPaymentRepository implements PaymentRepository {
@@ -45,12 +49,12 @@ export class PostgresPaymentRepository implements PaymentRepository {
   async insert(job: PaymentJob): Promise<void> {
     await this.pool.query(
       `insert into payment_jobs
-       (id, idempotency_key, request_hash, payer, recipient_meta_address, recipient_fingerprint,
+       (id, idempotency_key, request_hash, payer, mode, recipient, recipient_meta_address, recipient_fingerprint,
         chain_id, token_address, amount, amount_base_units, stealth_address, ephemeral_public_key,
         view_tag, helper_address, announcer_address, expires_at, state, transfer_tx_hash,
         announce_tx_hash, created_at, updated_at)
-       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)`,
-      [job.id, job.idempotencyKey, job.requestHash, job.payer, job.recipientMetaAddress, job.recipientFingerprint,
+       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23)`,
+      [job.id, job.idempotencyKey, job.requestHash, job.payer, job.mode, job.recipient, job.recipientMetaAddress ?? null, job.recipientFingerprint ?? null,
         job.chainId, job.tokenAddress, job.amount, job.amountBaseUnits.toString(), job.stealthAddress ?? null,
         job.ephemeralPublicKey ?? null, job.viewTag ?? null, job.helperAddress ?? null, job.announcerAddress ?? null,
         job.expiresAt, job.state, job.transferTxHash ?? null, job.announceTxHash ?? null, job.createdAt, job.updatedAt]
@@ -69,13 +73,25 @@ export class PostgresPaymentRepository implements PaymentRepository {
     );
     return updated;
   }
+
+  async findRecipientRegistration(recipient: string): Promise<RecipientRegistration | undefined> {
+    const result = await this.pool.query("select agent_id, normal_address, stealth_meta_address, fingerprint, updated_at from recipient_registrations where lower(normal_address) = lower($1)", [recipient]);
+    const row = result.rows[0];
+    return row ? { agentId: String(row.agent_id), normalAddress: String(row.normal_address) as `0x${string}`, stealthMetaAddress: String(row.stealth_meta_address), fingerprint: String(row.fingerprint), updatedAt: new Date(String(row.updated_at)).toISOString() } : undefined;
+  }
+
+  async upsertRecipientRegistration(registration: RecipientRegistration): Promise<void> {
+    await this.pool.query(`insert into recipient_registrations (recipient, agent_id, normal_address, stealth_meta_address, fingerprint, updated_at) values ($1,$2,$1,$3,$4,$5)
+      on conflict (recipient) do update set agent_id=$2, normal_address=$1, stealth_meta_address=$3, fingerprint=$4, updated_at=$5`, [registration.normalAddress, registration.agentId, registration.stealthMetaAddress, registration.fingerprint, registration.updatedAt]);
+  }
 }
 
 function rowToJob(row: Record<string, unknown>): PaymentJob {
   return {
     id: String(row.id), idempotencyKey: String(row.idempotency_key), requestHash: String(row.request_hash),
-    payer: String(row.payer) as `0x${string}`, recipientMetaAddress: String(row.recipient_meta_address),
-    recipientFingerprint: String(row.recipient_fingerprint), chainId: Number(row.chain_id),
+    payer: String(row.payer) as `0x${string}`, mode: String(row.mode ?? "STEALTH") as PaymentJob["mode"], recipient: String(row.recipient ?? row.recipient_meta_address),
+    recipientMetaAddress: row.recipient_meta_address ? String(row.recipient_meta_address) : undefined,
+    recipientFingerprint: row.recipient_fingerprint ? String(row.recipient_fingerprint) : undefined, chainId: Number(row.chain_id),
     tokenAddress: String(row.token_address) as `0x${string}`, amount: String(row.amount),
     amountBaseUnits: BigInt(String(row.amount_base_units)), stealthAddress: row.stealth_address as `0x${string}` | undefined,
     ephemeralPublicKey: row.ephemeral_public_key as string | undefined, viewTag: row.view_tag as string | undefined,

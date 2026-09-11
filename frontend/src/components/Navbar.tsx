@@ -16,7 +16,7 @@ export const Navbar: React.FC = () => {
     { label: 'Products', hasDropdown: true },
     { label: 'EVM Chains', hasDropdown: true },
     { label: 'Pricing', href: '#pricing' },
-    { label: 'Docs', href: '#developer-api' },
+    { label: 'Docs', href: 'https://tanmay1say.gitbook.io/agentgate-documentation/', external: true },
     { label: 'Resources', hasDropdown: true },
   ];
 
@@ -66,6 +66,8 @@ export const Navbar: React.FC = () => {
                 <a
                   key={item.label}
                   href={item.href || '#'}
+                  target={item.external ? '_blank' : undefined}
+                  rel={item.external ? 'noreferrer' : undefined}
                   className="flex items-center gap-1 px-3.5 py-2 rounded-lg text-sm font-medium text-rf-dark hover:bg-black/5 transition-colors"
                 >
                   {item.label}
@@ -113,6 +115,8 @@ export const Navbar: React.FC = () => {
               <a
                 key={item.label}
                 href={item.href || '#'}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noreferrer' : undefined}
                 onClick={() => setMobileOpen(false)}
                 className="text-sm font-medium text-rf-dark py-2"
               >

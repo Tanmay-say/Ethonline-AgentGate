@@ -11,6 +11,8 @@ export const PAYMENT_STATES = [
   "REJECTED",
   "EXPIRED"
 ] as const;
+export const PAYMENT_MODES = ["STANDARD", "STEALTH"] as const;
+export type PaymentMode = (typeof PAYMENT_MODES)[number];
 
 export type PaymentState = (typeof PAYMENT_STATES)[number];
 
@@ -19,8 +21,10 @@ export type PaymentJob = {
   idempotencyKey: string;
   requestHash: string;
   payer: `0x${string}`;
-  recipientMetaAddress: string;
-  recipientFingerprint: string;
+  mode: PaymentMode;
+  recipient: string;
+  recipientMetaAddress?: string;
+  recipientFingerprint?: string;
   chainId: number;
   tokenAddress: `0x${string}`;
   amount: string;
@@ -41,18 +45,24 @@ export type PaymentJob = {
 
 export type PrepareInput = {
   payer: `0x${string}`;
-  recipientMetaAddress: string;
-  recipientFingerprint: string;
+  mode?: PaymentMode;
+  recipient?: string;
+  recipientMetaAddress?: string;
+  recipientFingerprint?: string;
   token: `0x${string}`;
   amount: string;
   idempotencyKey: string;
 };
+
+export type RecipientRegistration = { agentId: string; normalAddress: `0x${string}`; stealthMetaAddress: string; fingerprint: string; updatedAt: string };
 
 export type PaymentRepository = {
   findByIdempotencyKey(key: string): Promise<PaymentJob | undefined>;
   findById(id: string): Promise<PaymentJob | undefined>;
   insert(job: PaymentJob): Promise<void>;
   update(id: string, patch: Partial<PaymentJob>): Promise<PaymentJob>;
+  findRecipientRegistration(recipient: string): Promise<RecipientRegistration | undefined>;
+  upsertRecipientRegistration(registration: RecipientRegistration): Promise<void>;
 };
 
 export const PAYMENT_TRANSITIONS: Record<PaymentState, readonly PaymentState[]> = {

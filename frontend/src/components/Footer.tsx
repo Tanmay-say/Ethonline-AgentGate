@@ -55,9 +55,10 @@ export const Footer: React.FC = () => {
           <div className="md:col-span-2">
             <h4 className="font-display font-bold text-white/80 text-sm uppercase tracking-wider mb-4">Developers</h4>
             <div className="flex flex-col gap-2.5 text-sm text-white/50">
+              <a href="https://tanmay1say.gitbook.io/agentgate-documentation/" target="_blank" rel="noreferrer" className="text-rf-orange hover:underline transition-colors font-medium">GitBook Documentation ↗</a>
               <a href="#developer-api" className="hover:text-white transition-colors">Bazantic Recipe</a>
               <a href="#developer-api" className="hover:text-white transition-colors">OpenAPI /payment-plans</a>
-              <a href="https://sepolia.basescan.org" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">BaseScan Explorer ↗</a>
+              <a href="https://sepolia.basescan.org/address/0x315825c5FaA23a091FD442a6658e769b76f14202" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">BaseScan Explorer ↗</a>
               <a href="#developer-api" className="hover:text-white transition-colors">TypeScript SDK</a>
             </div>
           </div>
