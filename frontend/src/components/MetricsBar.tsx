@@ -24,8 +24,13 @@ export const MetricsBar: React.FC = () => {
           <h2 className="font-display text-[22px] sm:text-[28px] md:text-[34px] font-bold text-rf-dark leading-tight text-center md:text-left max-w-2xl">
             Used by agent developers, privacy builders, and autonomous payment teams.
           </h2>
-          <a href="#developer-api" className="btn-orange whitespace-nowrap text-sm">
-            Read the Docs
+          <a
+            href="https://tanmay1say.gitbook.io/agentgate-documentation/"
+            target="_blank"
+            rel="noreferrer"
+            className="btn-orange whitespace-nowrap text-sm"
+          >
+            Read the Docs ↗
           </a>
         </motion.div>
 

@@ -76,11 +76,25 @@ export const Navbar: React.FC = () => {
               ))}
             </nav>
 
-            {/* Right Actions — Chat button removed */}
+            {/* Right Actions */}
             <div className="flex items-center gap-3">
               <a
+                href="https://tanmay1say.gitbook.io/agentgate-documentation/"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-rf-orange text-white font-display font-semibold text-sm hover:bg-rf-orange/90 transition-all shadow-sm"
+              >
+                <span>Docs</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+              </a>
+
+              <a
                 href="#developer-api"
-                className="hidden md:flex items-center gap-1 px-5 py-2 rounded-lg border-2 border-rf-orange text-rf-orange font-display font-semibold text-sm hover:bg-rf-orange hover:text-white transition-all"
+                className="hidden md:flex items-center gap-1 px-4 py-2 rounded-lg border-2 border-rf-orange text-rf-orange font-display font-semibold text-sm hover:bg-rf-orange hover:text-white transition-all"
               >
                 Log In
                 <ChevronDown className="w-3 h-3" />
@@ -123,8 +137,13 @@ export const Navbar: React.FC = () => {
                 {item.label}
               </a>
             ))}
-            <a href="#developer-api" className="btn-orange mt-3 text-center text-sm">
-              Get Started Free
+            <a
+              href="https://tanmay1say.gitbook.io/agentgate-documentation/"
+              target="_blank"
+              rel="noreferrer"
+              className="btn-orange mt-3 text-center text-sm flex items-center justify-center gap-1.5"
+            >
+              <span>View GitBook Docs ↗</span>
             </a>
           </motion.div>
         )}
