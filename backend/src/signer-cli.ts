@@ -8,7 +8,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import { baseSepolia } from "viem/chains";
 import { loadConfig } from "./config.js";
 import { deriveStealthDestination } from "./stealth.js";
-import { AUTONOMOUS_DEMO_HELPER, AUTONOMOUS_DEMO_MAX_DAILY_BASE_UNITS, AUTONOMOUS_DEMO_TOKEN, expectedAutonomousCalldata, validateAutonomousIntent } from "./signer-policy.js";
+import { AUTONOMOUS_DEMO_HELPER, AUTONOMOUS_DEMO_MAX_DAILY_BASE_UNITS, AUTONOMOUS_DEMO_TOKEN, expectedAutonomousCalldata, isPaymentReserved, validateAutonomousIntent } from "./signer-policy.js";
 
 const erc20Abi = [
   { type: "function", name: "allowance", stateMutability: "view", inputs: [{ name: "owner", type: "address" }, { name: "spender", type: "address" }], outputs: [{ type: "uint256" }] },
@@ -50,8 +50,10 @@ async function main() {
   const helper = config.HELPER_ADDRESS as `0x${string}` | undefined;
   const paymentMode = (plan.mode ?? "STEALTH").toUpperCase() as "STANDARD" | "STEALTH";
   const account = privateKeyToAccount(secret as `0x${string}`);
-  const publicClient = createPublicClient({ chain: baseSepolia, transport: http(config.BASE_SEPOLIA_RPC_URL) });
-  const walletClient = createWalletClient({ account, chain: baseSepolia, transport: http(config.BASE_SEPOLIA_RPC_URL) });
+  const rpcUrl = config.BASE_SEPOLIA_RPC_URL;
+  const rpcTransport = http(rpcUrl);
+  const publicClient = createPublicClient({ chain: baseSepolia, transport: rpcTransport });
+  const walletClient = createWalletClient({ account, chain: baseSepolia, transport: rpcTransport });
   const chainId = await publicClient.getChainId();
   if (chainId !== config.BASE_SEPOLIA_CHAIN_ID || plan.chain_id !== chainId) fail("CHAIN_ID_MISMATCH");
   if (account.address.toLowerCase() !== plan.payer.toLowerCase()) fail("SIGNER_ACCOUNT_DOES_NOT_MATCH_PLAN_PAYER");
@@ -86,12 +88,13 @@ async function main() {
     journalPath = process.env.AUTONOMOUS_DEMO_JOURNAL_PATH;
     if (!journalPath) fail("AUTONOMOUS_DEMO_JOURNAL_PATH is required outside the repository");
     const journalRelativePath = relative(resolve(process.cwd()), resolve(journalPath));
-    if (!isAbsolute(journalPath) || (journalRelativePath !== ".." && !journalRelativePath.startsWith(`..${sep}`))) fail("AUTONOMOUS_DEMO_JOURNAL_PATH must be absolute and outside the signer runtime");
+    const journalInsideRuntime = journalRelativePath === "" || (journalRelativePath !== ".." && !journalRelativePath.startsWith(`..${sep}`) && !isAbsolute(journalRelativePath));
+    if (!isAbsolute(journalPath) || journalInsideRuntime) fail("AUTONOMOUS_DEMO_JOURNAL_PATH must be absolute and outside the signer runtime");
     const journal = await readJournal(journalPath);
     dailySpent = journal.date === utcDate() ? BigInt(journal.spentBaseUnits) : 0n;
-    if (journal.paymentIds.includes(plan.payment_id)) fail("AUTONOMOUS_DEMO_PAYMENT_ALREADY_RESERVED");
+    if (isPaymentReserved(journal.paymentIds, plan.payment_id)) fail("AUTONOMOUS_DEMO_PAYMENT_ALREADY_RESERVED");
     validateAutonomousIntent({ paymentId: plan.payment_id, mode: paymentMode, chainId, payer: account.address, token, helper, recipient: plan.recipient as `0x${string}`, amountBaseUnits: amount, stealthAddress: stealth?.stealthAddress, ephemeralPublicKey: stealth?.ephemeralPublicKey, metadata, calldata, expiresAt: plan.expires_at }, dailySpent);
-    await reserveJournal(journalPath, dailySpent + amount, [...(journal.date === utcDate() ? journal.paymentIds : []), plan.payment_id]);
+    await reserveJournal(journalPath, dailySpent + amount, [...(journal.date === utcDate() ? journal.paymentIds : []), plan.payment_id], plan.payment_id);
   }
   const intent = { payment_id: plan.payment_id, mode: paymentMode.toLowerCase(), chain_id: chainId, signer: account.address, helper: helper ?? null, token, recipient: plan.recipient, amount_base_units: amount.toString(), stealth_address: stealth?.stealthAddress ?? null, ephemeral_public_key: stealth?.ephemeralPublicKey ?? null, view_tag: stealth?.viewTag ?? null, recipient_fingerprint: plan.recipient_fingerprint ?? null };
   console.log(JSON.stringify(intent, null, 2));
@@ -105,7 +108,21 @@ async function main() {
     await publicClient.waitForTransactionReceipt({ hash: approvalHash });
     console.log(`approval_tx_hash=${approvalHash}`);
   }
-  const txHash = await walletClient.sendTransaction({ to: (paymentMode === "STEALTH" ? helper : token) as `0x${string}`, data: calldata, chain: baseSepolia });
+  const [currentBlock, currentAllowance, currentBalance] = await Promise.all([
+    publicClient.getBlockNumber(),
+    paymentMode === "STEALTH" ? publicClient.readContract({ address: token, abi: erc20Abi, functionName: "allowance", args: [account.address, helper!] }) : Promise.resolve(0n),
+    publicClient.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [account.address] })
+  ]);
+  console.log(JSON.stringify({ rpc_hostname: new URL(rpcUrl).hostname, current_block: currentBlock.toString(), allowance: currentAllowance.toString(), balance: currentBalance.toString(), helper: helper ?? null, token, payment_id: plan.payment_id }, null, 2));
+  const transaction = { to: (paymentMode === "STEALTH" ? helper : token) as `0x${string}`, data: calldata, value: 0n, chain: baseSepolia } as const;
+  try {
+    await publicClient.call({ account: account.address, to: transaction.to, data: transaction.data, value: transaction.value });
+    console.log("SIMULATION_OK");
+  } catch (error) {
+    console.error("SIMULATION_REVERT", error instanceof Error ? error.message : error);
+    return;
+  }
+  const txHash = await walletClient.sendTransaction(transaction);
   console.log(`payment_tx_hash=${txHash}`);
   await publicClient.waitForTransactionReceipt({ hash: txHash });
   console.log(JSON.stringify({ ...intent, transaction_hash: txHash }, null, 2));
@@ -116,13 +133,13 @@ async function readJournal(path: string): Promise<DemoJournal> {
   try { return JSON.parse(await readFile(path, "utf8")) as DemoJournal; }
   catch { return { date: utcDate(), spentBaseUnits: "0", paymentIds: [] }; }
 }
-async function reserveJournal(path: string, spentBaseUnits: bigint, paymentIds: string[]): Promise<void> {
+async function reserveJournal(path: string, spentBaseUnits: bigint, paymentIds: string[], newPaymentId: string): Promise<void> {
   if (spentBaseUnits > AUTONOMOUS_DEMO_MAX_DAILY_BASE_UNITS) fail("AUTONOMOUS_DEMO_DAILY_LIMIT_EXCEEDED");
   await mkdir(dirname(path), { recursive: true });
   await writeFile(path, JSON.stringify({ date: utcDate(), spentBaseUnits: spentBaseUnits.toString(), paymentIds }, null, 2), { flag: "wx" }).catch(async (error: NodeJS.ErrnoException) => {
     if (error.code !== "EEXIST") throw error;
     const current = await readJournal(path);
-    if (current.paymentIds.some((id) => paymentIds.includes(id))) fail("AUTONOMOUS_DEMO_PAYMENT_ALREADY_RESERVED");
+    if (isPaymentReserved(current.paymentIds, newPaymentId)) fail("AUTONOMOUS_DEMO_PAYMENT_ALREADY_RESERVED");
     await writeFile(path, JSON.stringify({ date: utcDate(), spentBaseUnits: spentBaseUnits.toString(), paymentIds }, null, 2));
   });
 }

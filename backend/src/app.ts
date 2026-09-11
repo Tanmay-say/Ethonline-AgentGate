@@ -32,6 +32,19 @@ export function createApp(config: Config = loadConfig()) {
   app.use(rateLimit({ windowMs: 60_000, limit: 60, standardHeaders: true, legacyHeaders: false }));
 
   app.get("/healthz", (_req, res) => res.json({ status: "ok", database: pool ? "supabase-postgres" : "test-memory" }));
+  app.get("/health", async (_req, res) => {
+    let database: "ready" | "not_configured" | "unavailable" = pool ? "ready" : "not_configured";
+    if (pool) {
+      try { await pool.query("select 1"); } catch { database = "unavailable"; }
+    }
+    const endpoints = {
+      "GET /health": "ready", "GET /healthz": "ready", "GET /v1/capabilities": "ready", "GET /openapi.json": "ready",
+      "POST /v1/recipients": "ready", "POST /v1/payments/prepare": "ready", "GET /v1/payments/:id": "ready",
+      "GET /v1/payments/:id/signer-plan": "ready", "POST /v1/payments/:id/transactions": "ready",
+      "GET /v1/recipients/:address/meta-address": "disabled", "GET /v1/payments/:id/announce-tx": "disabled"
+    } as const;
+    res.status(database === "unavailable" ? 503 : 200).json({ status: database === "unavailable" ? "degraded" : "ok", database, endpoints });
+  });
   app.get("/v1/capabilities", (_req, res) => res.json({ chain_id: config.BASE_SEPOLIA_CHAIN_ID, network: "base-sepolia",
     token: config.USDC_ADDRESS ?? null, token_decimals: config.USDC_DECIMALS, announcer: config.ANNOUNCER_ADDRESS ?? null,
     registry: config.REGISTRY_ADDRESS ?? null, helper: config.HELPER_ADDRESS ?? null, max_payment_base_units: config.MAX_PAYMENT_BASE_UNITS.toString(),

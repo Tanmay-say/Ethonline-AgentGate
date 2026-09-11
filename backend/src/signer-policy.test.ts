@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { AUTONOMOUS_DEMO_HELPER, AUTONOMOUS_DEMO_TOKEN, expectedAutonomousCalldata, expectedStandardCalldata, validateAutonomousIntent, type AutonomousIntent } from "./signer-policy.js";
+import { AUTONOMOUS_DEMO_HELPER, AUTONOMOUS_DEMO_TOKEN, expectedAutonomousCalldata, expectedStandardCalldata, isPaymentReserved, validateAutonomousIntent, type AutonomousIntent } from "./signer-policy.js";
 
 function intent(overrides: Partial<AutonomousIntent> = {}): AutonomousIntent {
   const base = {
@@ -14,6 +14,14 @@ function intent(overrides: Partial<AutonomousIntent> = {}): AutonomousIntent {
 }
 
 describe("AUTONOMOUS_DEMO signer policy", () => {
+  it("blocks a duplicate reservation for the same payment only", () => {
+    expect(isPaymentReserved(["payment-a"], "payment-a")).toBe(true);
+  });
+
+  it("does not block a new payment because of a different stale reservation", () => {
+    expect(isPaymentReserved(["stale-payment"], "payment-b")).toBe(false);
+  });
+
   it("allows a one-USDC Base Sepolia helper payment within the daily cap", () => {
     expect(() => validateAutonomousIntent(intent(), 0n)).not.toThrow();
   });

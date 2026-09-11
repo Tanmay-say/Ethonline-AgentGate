@@ -2,10 +2,14 @@ import { encodeFunctionData } from "viem";
 
 export const AUTONOMOUS_DEMO_CHAIN_ID = 84532;
 export const AUTONOMOUS_DEMO_TOKEN = "0x036CbD53842c5426634e7929541eC2318f3dCF7e" as `0x${string}`;
-export const AUTONOMOUS_DEMO_HELPER = "0x315825c5FaA23a091FD442a6658e769b76f14202" as `0x${string}`;
+export const AUTONOMOUS_DEMO_HELPER = "0x30981Aa26AAF891AefA33a95c989EbC2D2551e0c" as `0x${string}`;
 export const AUTONOMOUS_DEMO_MAX_PAYMENT_BASE_UNITS = 1_000_000n;
 export const AUTONOMOUS_DEMO_MAX_DAILY_BASE_UNITS = 5_000_000n;
 export const AUTONOMOUS_DEMO_MAX_PLAN_TTL_SECONDS = 900;
+
+export function isPaymentReserved(paymentIds: string[], paymentId: string): boolean {
+  return paymentIds.includes(paymentId);
+}
 
 export const autonomousHelperAbi = [{
   type: "function", name: "payAndAnnounce", stateMutability: "nonpayable",

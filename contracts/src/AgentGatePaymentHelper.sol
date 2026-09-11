@@ -6,7 +6,7 @@ interface IERC20 {
 }
 
 interface IERC5564Announcer {
-    function announce(uint256 schemeId, bytes calldata stealthAddress, bytes calldata ephemeralPublicKey, bytes calldata metadata) external;
+    function announce(uint256 schemeId, address stealthAddress, bytes calldata ephemeralPublicKey, bytes calldata metadata) external;
 }
 
 contract AgentGatePaymentHelper {
@@ -22,6 +22,6 @@ contract AgentGatePaymentHelper {
     function payAndAnnounce(uint256 amount, address stealthAddress, bytes calldata ephemeralPublicKey, bytes calldata metadata) external {
         require(amount > 0 && stealthAddress != address(0), "invalid payment");
         require(token.transferFrom(msg.sender, stealthAddress, amount), "transfer failed");
-        announcer.announce(1, abi.encodePacked(stealthAddress), ephemeralPublicKey, metadata);
+        announcer.announce(1, stealthAddress, ephemeralPublicKey, metadata);
     }
 }

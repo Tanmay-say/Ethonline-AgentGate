@@ -17,6 +17,13 @@ describe("recipient-address payment UX", () => {
     const base = `http://127.0.0.1:${address.port}`;
     const headers = { "content-type": "application/json", authorization: `Bearer ${apiToken}` };
     try {
+      const health = await fetch(`${base}/health`);
+      const healthBody = await health.json() as { status: string; database: string; endpoints: Record<string, string> };
+      expect(health.status).toBe(200);
+      expect(healthBody.status).toBe("ok");
+      expect(healthBody.database).toBe("not_configured");
+      expect(healthBody.endpoints["POST /v1/payments/prepare"]).toBe("ready");
+      expect(healthBody.endpoints["POST /v1/payments/:id/transactions"]).toBe("ready");
       const keys = createRecipientKeys();
       const normalAddress = "0xA3b44f604589354cB65b6DAd431486aB7383D833";
       const registration = await fetch(`${base}/v1/recipients`, { method: "POST", headers, body: JSON.stringify({ agent_id: "agentB", normal_address: normalAddress, stealth_meta_address: keys.stealthMetaAddressURI, fingerprint: "agent-b-fingerprint" }) });

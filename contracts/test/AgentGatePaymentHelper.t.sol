@@ -31,7 +31,7 @@ contract MockAnnouncer {
     bool public shouldRevert;
     uint256 public calls;
     uint256 public schemeId;
-    bytes public stealthAddress;
+    address public stealthAddress;
     bytes public ephemeralPublicKey;
     bytes public metadata;
 
@@ -39,7 +39,7 @@ contract MockAnnouncer {
         shouldRevert = value;
     }
 
-    function announce(uint256 scheme, bytes calldata stealth, bytes calldata ephemeral, bytes calldata data) external {
+    function announce(uint256 scheme, address stealth, bytes calldata ephemeral, bytes calldata data) external {
         require(!shouldRevert, "announce failed");
         calls++;
         schemeId = scheme;
@@ -76,7 +76,7 @@ contract AgentGatePaymentHelperTest is Test {
         assertEq(token.balanceOf(stealth), 25);
         assertEq(announcer.calls(), 1);
         assertEq(announcer.schemeId(), 1);
-        assertEq(announcer.stealthAddress(), abi.encodePacked(stealth));
+        assertEq(announcer.stealthAddress(), stealth);
         assertEq(announcer.ephemeralPublicKey(), ephemeral);
         assertEq(announcer.metadata(), metadata);
     }
