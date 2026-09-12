@@ -4,4 +4,5 @@ import { loadConfig } from "./config.js";
 
 const config = loadConfig();
 const app = createApp(config);
-app.listen(config.PORT, () => console.log(`AgentGate API listening on http://localhost:${config.PORT}`));
+const port = Number(process.env.PORT || config.PORT || 8080);
+app.listen(port, "0.0.0.0", () => console.log(`AgentGate API listening on http://0.0.0.0:${port}`));

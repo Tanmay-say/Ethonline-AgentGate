@@ -26,6 +26,7 @@ export function createApp(config: Config = loadConfig()) {
   const service = new PaymentService(repository, config);
   const verifier = new BaseSepoliaVerifier(config);
   const app = express();
+  app.set("trust proxy", 1);
   app.use(helmet());
   app.use(cors({ origin: config.FRONTEND_ORIGIN }));
   app.use(express.json({ limit: "64kb" }));
