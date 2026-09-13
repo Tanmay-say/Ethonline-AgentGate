@@ -216,6 +216,46 @@ body {
   background: rgba(0,0,0,0.05);
 }
 
+.field-label {
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(30, 30, 30, 0.65);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.field-input {
+  width: 100%;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px 14px;
+  color: #1e1e1e;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.field-input:focus {
+  border-color: #f15a24;
+  box-shadow: 0 0 0 3px rgba(241, 90, 36, 0.12);
+}
+
+.result-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+}
+
+.result-cell span { color: rgba(30, 30, 30, 0.58); }
+.result-cell strong { overflow-wrap: anywhere; }
+
 /* Trust logo carousel */
 .logo-track {
   display: flex;

@@ -6,7 +6,7 @@ export const MetricsBar: React.FC = () => {
   const inView = useInView(ref, { once: true, margin: '-80px' });
 
   const partners = [
-    'Base Sepolia', 'Ethereum', 'Claude Code', 'Bazantic',
+    'Base Sepolia', 'USDC', 'Claude Code', 'Bazantic',
     'ERC-5564', 'Foundry', 'Viem', 'OpenZeppelin',
   ];
 
@@ -48,22 +48,33 @@ export const MetricsBar: React.FC = () => {
           </div>
         </div>
 
-        {/* 3 Big Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 border-t-2 border-black/8">
+        {/* 4 Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t-2 border-black/8 divide-y-2 sm:divide-y-0 divide-black/8">
           {[
-            { num: '99.99%', desc: 'verified delivery across all agent tasks' },
-            { num: '<85ms', desc: 'stealth address derivation latency' },
-            { num: '100%', desc: 'non-custodial key isolation' },
+            { metric: 'Base Sepolia', desc: 'Live USDC payment infrastructure' },
+            { metric: 'ERC-5564', desc: 'Fresh stealth destination per payment' },
+            { metric: 'Bazantic MCP', desc: 'Agent-native payment interface' },
+            { metric: '0 private keys', desc: 'Signer isolated from agents & gateway' },
           ].map((stat, i) => (
             <motion.div
-              key={stat.num}
+              key={stat.metric}
               initial={{ opacity: 0, y: 20 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.2 + i * 0.15, duration: 0.5 }}
-              className={`py-8 px-5 text-center ${i < 2 ? 'md:border-r-2 md:border-black/8' : ''} ${i > 0 ? 'border-t-2 md:border-t-0 border-black/8' : ''}`}
+              transition={{ delay: 0.15 + i * 0.1, duration: 0.5 }}
+              className={`py-8 px-4 text-center flex flex-col justify-center items-center ${
+                i % 2 === 0 ? 'sm:border-r-2 sm:border-black/8' : ''
+              } ${
+                i >= 2 ? 'sm:border-t-2 sm:border-black/8 lg:border-t-0' : ''
+              } ${
+                i < 3 ? 'lg:border-r-2 lg:border-black/8' : 'lg:border-r-0'
+              }`}
             >
-              <div className="stat-number text-[56px] md:text-[68px]">{stat.num}</div>
-              <p className="mt-1 text-sm text-rf-dark/60 font-medium">{stat.desc}</p>
+              <div className="stat-number text-[26px] sm:text-[28px] lg:text-[30px] xl:text-[34px] leading-tight">
+                {stat.metric}
+              </div>
+              <p className="mt-2 text-xs sm:text-sm text-rf-dark/70 font-medium max-w-[220px] leading-relaxed">
+                {stat.desc}
+              </p>
             </motion.div>
           ))}
         </div>

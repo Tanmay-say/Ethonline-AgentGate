@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ChevronDown } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
+import { useWallet } from '../wallet';
+
+function shortenAddress(address: string): string {
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
 
 export const Navbar: React.FC = () => {
+  const { address, connect, disconnect, isAvailable, isConnecting } = useWallet();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -13,25 +19,37 @@ export const Navbar: React.FC = () => {
   }, []);
 
   const navItems = [
-    { label: 'Products', hasDropdown: true },
-    { label: 'EVM Chains', hasDropdown: true },
-    { label: 'Pricing', href: '#pricing' },
+    { label: 'Send Payment', href: '#payment-studio' },
+    { label: 'How It Works', href: '#how-it-works' },
+    { label: 'Bazantic', href: '#bazantic' },
+    { label: 'Architecture', href: '#architecture' },
+    { label: 'Proof', href: '#proof' },
     { label: 'Docs', href: 'https://tanmay1say.gitbook.io/agentgate-documentation/', external: true },
-    { label: 'Resources', hasDropdown: true },
   ];
+
+  const navigateToConsole = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    window.history.pushState({}, '', '/console');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  };
+
+  const handleConnect = () => {
+    void connect().catch(() => undefined);
+  };
 
   return (
     <>
       {/* Top Announcement Banner */}
       <div className="top-banner font-sans">
-        Building at ETHOnline 2026? Non-custodial stealth payments for AI agents.{' '}
+        Building for ETHOnline 2026 · Non-custodial stealth payments for AI agents ·{' '}
         <a
           href="https://github.com/Tanmay-say/Ethonline-AgentGate"
           target="_blank"
           rel="noreferrer"
-          className="font-semibold text-rf-orange hover:underline"
+          className="font-semibold text-rf-orange hover:underline inline-flex items-center gap-0.5"
         >
-          Star on GitHub →
+          <span>Star on GitHub</span>
+          <span aria-hidden="true">→</span>
         </a>
       </div>
 
@@ -61,44 +79,38 @@ export const Navbar: React.FC = () => {
             </motion.a>
 
             {/* Desktop Nav Links */}
-            <nav className="hidden lg:flex items-center gap-0.5">
+            <nav className="hidden lg:flex items-center gap-1">
               {navItems.map((item) => (
                 <a
                   key={item.label}
-                  href={item.href || '#'}
+                  href={item.href}
                   target={item.external ? '_blank' : undefined}
                   rel={item.external ? 'noreferrer' : undefined}
                   className="flex items-center gap-1 px-3.5 py-2 rounded-lg text-sm font-medium text-rf-dark hover:bg-black/5 transition-colors"
                 >
-                  {item.label}
-                  {item.hasDropdown && <ChevronDown className="w-3 h-3 opacity-40" />}
+                  <span>{item.label}</span>
+                  {item.external && <ExternalLink className="w-3 h-3 opacity-40" />}
                 </a>
               ))}
             </nav>
 
             {/* Right Actions */}
             <div className="flex items-center gap-3">
-              <a
-                href="https://tanmay1say.gitbook.io/agentgate-documentation/"
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-rf-orange text-white font-display font-semibold text-sm hover:bg-rf-orange/90 transition-all shadow-sm"
-              >
-                <span>Docs</span>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                  <polyline points="15 3 21 3 21 9" />
-                  <line x1="10" y1="14" x2="21" y2="3" />
-                </svg>
-              </a>
+              {address && (
+                <a href="/console" onClick={navigateToConsole} className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-lg bg-rf-orange text-white font-display font-semibold text-sm hover:bg-rf-orange/90 transition-all shadow-sm">
+                  <span>Test Console</span>
+                </a>
+              )}
 
-              <a
-                href="#developer-api"
-                className="hidden md:flex items-center gap-1 px-4 py-2 rounded-lg border-2 border-rf-orange text-rf-orange font-display font-semibold text-sm hover:bg-rf-orange hover:text-white transition-all"
-              >
-                Log In
-                <ChevronDown className="w-3 h-3" />
-              </a>
+              {address ? (
+                <button type="button" onClick={disconnect} className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-lg border-2 border-black/15 text-rf-dark font-display font-semibold text-sm hover:bg-black/5 transition-all" title="Disconnect this app session">
+                  <span>{shortenAddress(address)}</span>
+                </button>
+              ) : (
+                <button type="button" onClick={handleConnect} disabled={isConnecting || !isAvailable} className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-lg border-2 border-rf-orange text-rf-orange font-display font-semibold text-sm hover:bg-rf-orange hover:text-white transition-all disabled:opacity-50">
+                  <span>{isConnecting ? 'Connecting...' : isAvailable ? 'Connect Wallet' : 'Wallet Unavailable'}</span>
+                </button>
+              )}
 
               {/* Mobile toggle */}
               <button
@@ -123,18 +135,19 @@ export const Navbar: React.FC = () => {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="lg:hidden bg-white border-t border-black/5 px-6 py-5 flex flex-col gap-2"
+            className="lg:hidden bg-white border-t border-black/5 px-6 py-5 flex flex-col gap-2 shadow-lg"
           >
             {navItems.map((item) => (
               <a
                 key={item.label}
-                href={item.href || '#'}
+                href={item.href}
                 target={item.external ? '_blank' : undefined}
                 rel={item.external ? 'noreferrer' : undefined}
                 onClick={() => setMobileOpen(false)}
-                className="text-sm font-medium text-rf-dark py-2"
+                className="text-sm font-medium text-rf-dark py-2 flex items-center justify-between"
               >
-                {item.label}
+                <span>{item.label}</span>
+                {item.external && <ExternalLink className="w-3.5 h-3.5 opacity-40" />}
               </a>
             ))}
             <a
@@ -145,6 +158,8 @@ export const Navbar: React.FC = () => {
             >
               <span>View GitBook Docs ↗</span>
             </a>
+            {address && <a href="/console" onClick={navigateToConsole} className="btn-orange mt-3 text-center text-sm">Test Console</a>}
+            {!address && <button type="button" onClick={handleConnect} disabled={isConnecting || !isAvailable} className="btn-outline mt-3 text-center text-sm disabled:opacity-50">{isConnecting ? 'Connecting...' : isAvailable ? 'Connect Wallet' : 'Wallet Unavailable'}</button>}
           </motion.div>
         )}
       </header>

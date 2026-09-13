@@ -24,6 +24,10 @@ describe("recipient-address payment UX", () => {
       expect(healthBody.database).toBe("not_configured");
       expect(healthBody.endpoints["POST /v1/payments/prepare"]).toBe("ready");
       expect(healthBody.endpoints["POST /v1/payments/:id/transactions"]).toBe("ready");
+      const unauthenticatedPrepare = await fetch(`${base}/v1/payments/prepare`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({}) });
+      expect(unauthenticatedPrepare.status).toBe(401);
+      const unauthenticatedSignerPlan = await fetch(`${base}/v1/payments/example/signer-plan`);
+      expect(unauthenticatedSignerPlan.status).toBe(401);
       const keys = createRecipientKeys();
       const normalAddress = "0xA3b44f604589354cB65b6DAd431486aB7383D833";
       const registration = await fetch(`${base}/v1/recipients`, { method: "POST", headers, body: JSON.stringify({ agent_id: "agentB", normal_address: normalAddress, stealth_meta_address: keys.stealthMetaAddressURI, fingerprint: "agent-b-fingerprint" }) });
@@ -40,6 +44,35 @@ describe("recipient-address payment UX", () => {
       const standard = await fetch(`${base}/v1/payments/prepare`, { method: "POST", headers, body: JSON.stringify({ payer: "0x1111111111111111111111111111111111111111", recipient: normalAddress, amount: "1", token: "USDC", mode: "standard", idempotency_key: "api-standard-test-1234" }) });
       expect(standard.status).toBe(201);
       expect((await standard.json()).mode).toBe("STANDARD");
+      const human = await fetch(`${base}/v1/human/payments/prepare`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ payer: "0x1111111111111111111111111111111111111111", recipient: normalAddress, amount: "1", token: "USDC", mode: "stealth", idempotency_key: "human-stealth-test-1234" }) });
+      expect(human.status).toBe(201);
+      const humanBody = await human.json() as Record<string, unknown>;
+      expect(humanBody.state).toBe("PREPARED");
+      expect(humanBody.transfer_tx_hash).toBeNull();
+      expect(humanBody.announce_tx_hash).toBeNull();
+    } finally {
+      await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+    }
+  });
+
+  it("does not register the human preparation route in production", async () => {
+    const config = loadConfig({
+      NODE_ENV: "production",
+      DATABASE_URL: "postgresql://user:password@localhost:5432/agentgate",
+      API_BEARER_TOKEN: "production-api-token-1234",
+      SIGNER_BEARER_TOKEN: "production-signer-token-1234",
+      USDC_ADDRESS: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+    });
+    const server = await new Promise<Server>((resolve) => {
+      const instance = createApp(config).listen(0, () => resolve(instance));
+    });
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("test server did not bind");
+    try {
+      const human = await fetch(`http://127.0.0.1:${address.port}/v1/human/payments/prepare`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({}) });
+      expect(human.status).toBe(404);
+      const existing = await fetch(`http://127.0.0.1:${address.port}/v1/payments/prepare`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({}) });
+      expect(existing.status).toBe(401);
     } finally {
       await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
     }

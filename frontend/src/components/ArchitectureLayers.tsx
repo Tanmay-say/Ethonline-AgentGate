@@ -1,48 +1,67 @@
 import React, { useRef } from 'react';
 import { motion, useInView } from 'motion/react';
+import { Bot, Server, KeyRound, CheckCircle2 } from 'lucide-react';
 
 const layers = [
   {
+    num: '01',
     cls: 'blue-layer',
     borderCls: 'border-rf-blue',
-    title: 'Own the Privacy',
-    img: 'https://cdn.prod.website-files.com/62f387a85a056619ebadb8de/69a6adc5477d3b11cf1c53f9_Group%202087331407.svg',
-    desc: 'SECP256k1 scheme-1 stealth address derivation for apps where exposed recipient history breaks user trust. Built to generate fresh, unlinkable one-time destinations with each payment.',
+    icon: Bot,
+    title: 'Agent & User Intent Layer',
+    desc: 'The agent or user requests a payment simply using the recipient’s regular wallet address. Bazantic Gateway and MCP translate natural language prompts and recipes into structured prepare requests.',
     badges: [
-      { cls: 'orange', label: 'ERC-5564 Announcement emission' },
-      { cls: 'blue', label: 'Fresh ECDH shared secret per payment' },
-      { cls: 'blue', label: 'Recipient offline scanning & spending' },
+      { cls: 'orange', label: 'Normal wallet address input' },
+      { cls: 'blue', label: 'Bazantic MCP & Gateway interface' },
+      { cls: 'blue', label: 'Zero stealth complexity exposed' },
     ],
     badgeBorder: 'border-rf-blue/50',
     reverse: false,
   },
   {
+    num: '02',
     cls: 'orange-layer',
     borderCls: 'border-rf-peach',
-    title: 'Own the Companion',
-    img: 'https://cdn.prod.website-files.com/62f387a85a056619ebadb8de/69dfa11dac5b06d54a67fcc6_e5ea8999e441fa27b9a4eee065aa7acb_Group%202087331528.svg',
-    desc: 'Hardware-isolated local signing companion engineered to stay responsive through LLM retries and network timeouts. Durable nonce journals prevent duplicated agent-initiated transfers.',
+    icon: Server,
+    title: 'AgentGate Backend & Policy Engine',
+    desc: 'The live Railway backend resolves registered recipient metadata, enforces daily spending caps and token whitelist policies, and derives a fresh SECP256k1 ERC-5564 stealth destination.',
     badges: [
-      { cls: 'orange', label: 'OS-isolated from Claude filesystem' },
-      { cls: 'blue', label: 'Durable nonce journal per plan' },
-      { cls: 'violet', label: 'Human approval fingerprint gate' },
+      { cls: 'orange', label: 'Registered metadata resolution' },
+      { cls: 'blue', label: 'Fresh stealth destination derived' },
+      { cls: 'violet', label: 'State: PREPARED (Idempotent)' },
     ],
     badgeBorder: 'border-rf-peach/50',
     reverse: true,
   },
   {
+    num: '03',
     cls: 'violet-layer',
     borderCls: 'border-rf-violet',
-    title: 'Own the Agent',
-    img: 'https://cdn.prod.website-files.com/62f387a85a056619ebadb8de/699497d6e1a720adf1b8d9de_d39d5555fa8f600b54b6b9d9e0073f58_Group%20470231.avif',
-    desc: 'Production-ready agent tooling built on the official Bazantic MCP adapter for teams that need predictable behavior, cleaner operations, and less infrastructure overhead.',
+    icon: KeyRound,
+    title: 'Signer Isolation Security Boundary',
+    desc: 'The most critical boundary: private keys stay completely outside the Gateway and agent API. The agent can only create a PREPARED plan; an authorized isolated signer must review and broadcast.',
     badges: [
-      { cls: 'orange', label: 'Published Recipe & tools/list support' },
-      { cls: 'blue', label: 'x402-aware baz curl execution' },
-      { cls: 'violet', label: 'Base Sepolia verified contracts' },
+      { cls: 'orange', label: 'Private key isolated from API' },
+      { cls: 'blue', label: 'Protected against LLM retry loops' },
+      { cls: 'violet', label: 'next_step: local_signer_review' },
     ],
     badgeBorder: 'border-rf-violet/50',
     reverse: false,
+  },
+  {
+    num: '04',
+    cls: 'blue-layer',
+    borderCls: 'border-rf-blue',
+    icon: CheckCircle2,
+    title: 'Base Sepolia On-Chain Settlement',
+    desc: 'The verified helper contract executes the 1 USDC transfer to the fresh stealth address and emits an ERC-5564 Announcement with the ephemeral public key and view tag for offline recipient discovery.',
+    badges: [
+      { cls: 'orange', label: 'Base Sepolia Chain ID 84532' },
+      { cls: 'blue', label: 'Corrected Helper: 0x30981A...1e0c' },
+      { cls: 'violet', label: 'ERC-5564 Announcement emitted' },
+    ],
+    badgeBorder: 'border-rf-blue/50',
+    reverse: true,
   },
 ];
 
@@ -57,55 +76,72 @@ export const ArchitectureLayers: React.FC = () => {
   const inView = useInView(ref, { once: true, margin: '-60px' });
 
   return (
-    <section id="architecture" className="py-14 md:py-20 bg-white">
+    <section id="architecture" className="py-16 md:py-24 bg-[#F5F0EB]">
       <div ref={ref} className="max-w-[1280px] mx-auto px-6 lg:px-10">
+        
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.45 }}
-          className="text-center mb-12"
+          className="text-center mb-14 max-w-3xl mx-auto"
         >
-          <h2 className="font-display text-[28px] sm:text-[36px] md:text-[42px] font-bold text-rf-dark leading-tight">
-            Years of stealth payment research,
+          <span className="text-xs font-bold text-rf-orange uppercase tracking-wider bg-rf-orange/10 px-3 py-1 rounded-full">
+            Full System Architecture
+          </span>
+          <h2 className="font-display text-[30px] sm:text-[38px] md:text-[44px] font-bold text-rf-dark leading-tight mt-3">
+            Designed for Autonomous Agents, Isolated for Real Security
           </h2>
-          <h2 className="font-display text-[28px] sm:text-[36px] md:text-[42px] font-bold text-rf-dark leading-tight">
-            now available as one agent-ready stack
-          </h2>
+          <p className="text-rf-dark/70 text-base mt-2">
+            The agent never holds or sees the private signing key. AgentGate separates payment preparation from payment execution.
+          </p>
         </motion.div>
 
+        {/* 4 Architecture Cards */}
         <div className="flex flex-col gap-6">
-          {layers.map((layer, i) => (
-            <motion.div
-              key={layer.title}
-              initial={{ opacity: 0, y: 30 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.15 + i * 0.15, duration: 0.5 }}
-              className={`layer-card ${layer.cls}`}
-              style={{ padding: '36px' }}
-            >
-              <div className={`flex flex-col ${layer.reverse ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-6 items-start`}>
-                <motion.div
-                  whileHover={{ scale: 1.04 }}
-                  transition={{ type: 'spring', stiffness: 300 }}
-                  className={`w-[180px] h-[140px] rounded-xl bg-white/60 border ${layer.borderCls} flex items-center justify-center shrink-0 overflow-hidden p-3`}
-                >
-                  <img src={layer.img} alt={layer.title} className="w-full h-full object-contain" />
-                </motion.div>
-                <div>
-                  <h3 className="font-display text-[24px] font-bold text-rf-dark mb-2">{layer.title}</h3>
-                  <p className="text-[15px] text-rf-dark/75 leading-relaxed max-w-2xl">{layer.desc}</p>
-                </div>
-              </div>
-              <div className={`flex flex-wrap gap-2.5 mt-6 pt-5 border-t ${layer.badgeBorder}`}>
-                {layer.badges.map((b) => (
-                  <div key={b.label} className={`feature-badge ${b.cls}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${dotColors[b.cls]}`} />
-                    {b.label}
+          {layers.map((layer, i) => {
+            const Icon = layer.icon;
+            return (
+              <motion.div
+                key={layer.title}
+                initial={{ opacity: 0, y: 24 }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: 0.15 + i * 0.12, duration: 0.45 }}
+                className={`layer-card ${layer.cls} bg-white shadow-sm border`}
+                style={{ padding: '32px' }}
+              >
+                <div className={`flex flex-col ${layer.reverse ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-6 items-start justify-between`}>
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-2xl bg-white border border-black/10 flex items-center justify-center shrink-0 shadow-sm">
+                      <Icon className="w-7 h-7 text-rf-dark" />
+                    </div>
+                    <div>
+                      <div className="font-mono text-xs font-bold text-rf-orange uppercase tracking-wider">
+                        Layer {layer.num}
+                      </div>
+                      <h3 className="font-display text-[22px] sm:text-[26px] font-bold text-rf-dark mt-0.5">
+                        {layer.title}
+                      </h3>
+                    </div>
                   </div>
-                ))}
-              </div>
-            </motion.div>
-          ))}
+
+                  <p className="text-sm sm:text-[15px] text-rf-dark/75 leading-relaxed max-w-xl">
+                    {layer.desc}
+                  </p>
+                </div>
+
+                <div className={`flex flex-wrap gap-2.5 mt-6 pt-5 border-t ${layer.badgeBorder}`}>
+                  {layer.badges.map((b) => (
+                    <div key={b.label} className={`feature-badge ${b.cls}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${dotColors[b.cls]}`} />
+                      <span>{b.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>

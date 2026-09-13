@@ -13,7 +13,7 @@ const fadeUp = {
 export const Hero: React.FC = () => {
   return (
     <section className="relative overflow-hidden" style={{ background: 'linear-gradient(180deg, #F5F0EB 0%, #FDF0E3 40%, #F5F0EB 100%)' }}>
-      <div className="max-w-[1280px] mx-auto px-6 lg:px-10 pt-10 pb-4">
+      <div className="max-w-[1280px] mx-auto px-6 lg:px-10 pt-10 pb-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center min-h-[65vh]">
           
           {/* Left: Text Content */}
@@ -25,9 +25,10 @@ export const Hero: React.FC = () => {
               variants={fadeUp}
               className="font-display text-[38px] sm:text-[46px] md:text-[52px] lg:text-[56px] font-bold text-rf-dark leading-[1.08] tracking-tight"
             >
-              The fastest stealth payment API for agents that can't tolerate exposure
+              Private payments for AI agents
             </motion.h1>
 
+            {/* Signature colorful text pill overlays */}
             <motion.p
               initial="hidden"
               animate="visible"
@@ -38,10 +39,10 @@ export const Hero: React.FC = () => {
               <span className="span-pill orange">Non-custodial</span> ,{' '}
               <span className="span-pill violet">ERC-5564 stealth</span>{' '}
               agent payments with{' '}
-              <span className="span-pill blue">99.99% delivery</span> .
+              <span className="span-pill blue">recipient privacy</span> .
             </motion.p>
 
-            {/* CTA Row */}
+            {/* CTA Row with original border and styling */}
             <motion.div
               initial="hidden"
               animate="visible"
@@ -49,16 +50,48 @@ export const Hero: React.FC = () => {
               variants={fadeUp}
               className="mt-7 flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl border-2 border-rf-orange-light bg-white/40"
             >
-              <a href="#developer-api" className="btn-orange whitespace-nowrap text-sm">
-                Start for Free
+              <a href="#payment-studio" className="btn-orange whitespace-nowrap text-sm">
+                Send Payment Demo
               </a>
               <p className="text-[13px] text-rf-dark/70 leading-relaxed">
-                Built by infrastructure engineers running nodes for leading ERC-5564 stealth protocols, AI agent frameworks, and DeFi privacy tools.
+                Send USDC to an agent using their normal wallet address. AgentGate derives fresh stealth destinations while keeping transaction signing outside the agent-facing API.
               </p>
+            </motion.div>
+
+            {/* Quick links underneath CTA */}
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              custom={3}
+              variants={fadeUp}
+              className="mt-5 flex items-center gap-3 text-xs text-rf-dark/70 flex-wrap"
+            >
+              <a href="#mcp-connect" className="text-rf-orange font-semibold hover:underline flex items-center gap-1">
+                <span>Direct MCP Connect</span>
+                <span aria-hidden="true">→</span>
+              </a>
+              <span>·</span>
+              <a
+                href="https://sepolia.basescan.org/tx/0xae260c2db883c51bea772ea2d70ff9becbac98815eb0253ac3c5cbb4cdda8dca"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-rf-dark transition-colors"
+              >
+                BaseScan Verified Proof ↗
+              </a>
+              <span>·</span>
+              <a
+                href="https://tanmay1say.gitbook.io/agentgate-documentation/"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-rf-dark transition-colors"
+              >
+                GitBook Docs ↗
+              </a>
             </motion.div>
           </div>
 
-          {/* Right: Video — bigger circle, no logo overlay */}
+          {/* Right: Video — exact circle with colored dots from ethagentgate.vercel.app */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -80,7 +113,7 @@ export const Hero: React.FC = () => {
                 </div>
               </div>
 
-              {/* Decorative dots */}
+              {/* Decorative floating dots */}
               <motion.div
                 animate={{ y: [0, -6, 0] }}
                 transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}

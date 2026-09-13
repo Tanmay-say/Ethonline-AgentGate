@@ -55,14 +55,18 @@ export function createApp(config: Config = loadConfig()) {
     res.status(404).json({ error: "RECIPIENT_REGISTRY_DISCOVERY_NOT_CONFIGURED", remedy: "Provide a manually verified scheme-1 stealth meta-address.", privacy_notice: PRIVACY_NOTICE });
   });
 
-  app.post("/v1/payments/prepare", requireBearer(config.API_BEARER_TOKEN), asyncHandler(async (req, res) => {
+  const preparePayment = asyncHandler(async (req, res) => {
     const parsed = prepareSchema.parse(req.body);
     const token = parsed.token === "USDC" ? config.USDC_ADDRESS : parsed.token;
     if (!token) throw new Error("USDC_NOT_CONFIGURED");
     const result = await service.prepare({ payer: parsed.payer as `0x${string}`, mode: parsed.mode.toUpperCase() as typeof PAYMENT_MODES[number], recipient: parsed.recipient, token: token as `0x${string}`, amount: parsed.amount,
       idempotencyKey: parsed.idempotency_key });
     res.status(result.existed ? 200 : 201).json({ ...service.response(result.job), next_step: "local_signer_review" });
-  }));
+  });
+  app.post("/v1/payments/prepare", requireBearer(config.API_BEARER_TOKEN), preparePayment);
+  if (config.NODE_ENV !== "production") {
+    app.post("/v1/human/payments/prepare", preparePayment);
+  }
 
   app.get("/v1/payments/:id", requireBearer(config.API_BEARER_TOKEN), asyncHandler(async (req, res) => {
     const job = await service.get(String(req.params.id));
